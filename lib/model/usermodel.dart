@@ -1,14 +1,14 @@
 class UserModel {
   final String name;
   final String email;
-  final String image;
-  final String uid;
+  String? image;
+  String uid;
   final DateTime lastSeen;
   final bool isOnline;
 
   UserModel({
     required this.email,
-    required this.image,
+    this.image,
     required this.isOnline,
     required this.lastSeen,
     required this.name,

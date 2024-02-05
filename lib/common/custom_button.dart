@@ -4,10 +4,12 @@ class CustomButton extends StatelessWidget {
   const CustomButton({
     required this.onTap,
     required this.isloading,
+    required this.text,
     super.key,
   });
   final void Function()? onTap;
   final bool isloading;
+  final String text;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -29,9 +31,9 @@ class CustomButton extends StatelessWidget {
                       strokeCap: StrokeCap.round,
                     ),
                   )
-                : const Text(
-                    'Login',
-                    style: TextStyle(color: Colors.white),
+                : Text(
+                    text,
+                    style: const TextStyle(color: Colors.white),
                   )),
       ),
     );

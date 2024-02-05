@@ -1,3 +1,4 @@
+import 'package:chatapp/auth/screens/sign_up.dart';
 import 'package:chatapp/auth/widgets/text_fields.dart';
 import 'package:chatapp/common/custom_button.dart';
 import 'package:chatapp/controller/auth_controller.dart';
@@ -45,30 +46,58 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-              CustomButton(
-                isloading: isloading,
-                onTap: () async {
-                  setState(() {
-                    isloading = true;
-                  });
-                  try {
-                    await context
-                        .read<AuthController>()
-                        .sighInWithEmailAndPassword(emailController.text.trim(),
-                            passwordController.text.trim());
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ChatScreen()));
-                  } catch (e) {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text(e.toString())));
-                  }
-                  setState(() {
-                    isloading = false;
-                  });
-                },
-              )
+              Column(
+                children: [
+                  CustomButton(
+                    text: 'Log In',
+                    isloading: isloading,
+                    onTap: () async {
+                      setState(() {
+                        isloading = true;
+                      });
+                      try {
+                        await context
+                            .read<AuthController>()
+                            .sighInWithEmailAndPassword(
+                                emailController.text.trim(),
+                                passwordController.text.trim());
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const ChatScreen()));
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          backgroundColor: Colors.deepOrange,
+                          content: Text(
+                            e.toString(),
+                          ),
+                        ));
+                      }
+                      setState(() {
+                        isloading = false;
+                      });
+                    },
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignUpScreen()));
+                      },
+                      child: const Text(
+                        'SignUp',
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
