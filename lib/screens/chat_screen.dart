@@ -1,5 +1,7 @@
+import 'package:chatapp/auth/screens/login.dart';
 import 'package:chatapp/controller/auth_controller.dart';
 import 'package:chatapp/widgets/single_user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +31,22 @@ class _ChatScreenState extends State<ChatScreen> {
         backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
         title: const Text('Chat Screen'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: GestureDetector(
+                onTap: () async {
+                  print('object');
+                  await FirebaseAuth.instance.signOut().then((value) {
+                    return Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (context) => const LoginScreen()),
+                        (route) => false);
+                  });
+                },
+                child: const Icon(Icons.logout)),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),

@@ -6,6 +6,7 @@ class AuthDB {
   Future<void> signUpUser(
       {required UserModel user, required UserCredential credential}) async {
     try {
+      print('i am here');
       user.uid = credential.user!.uid;
       await FirebaseFirestore.instance
           .collection('users')

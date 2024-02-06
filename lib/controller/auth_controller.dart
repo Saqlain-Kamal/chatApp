@@ -108,4 +108,19 @@ class AuthController extends ChangeNotifier {
   void updateUser({required UserModel user}) async {
     await db.updateUser(user: user);
   }
+
+  Future<User?> checkCurrentUser(BuildContext context) async {
+    try {
+      final isCurrentUser = db.isCurrentUser();
+      if (isCurrentUser != null) {
+        appUser = await db.getUserById(uid: isCurrentUser.uid);
+        log(appUser!.toJson().toString());
+        //notifyListeners();
+        return isCurrentUser;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+    return null;
+  }
 }
