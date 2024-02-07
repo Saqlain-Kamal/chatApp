@@ -26,7 +26,7 @@ class _SingleUserState extends State<SingleUser> {
             context,
             MaterialPageRoute(
                 builder: (context) => IndividualChatScreen(
-                      user: widget.user,
+                      userId: widget.user.uid,
                     )));
       },
       child: ListTile(

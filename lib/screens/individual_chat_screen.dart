@@ -2,14 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatapp/auth/widgets/messge_bubble.dart';
 import 'package:chatapp/common/media_query.dart';
 import 'package:chatapp/controller/auth_controller.dart';
-import 'package:chatapp/model/message_model.dart';
-import 'package:chatapp/model/usermodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class IndividualChatScreen extends StatefulWidget {
-  const IndividualChatScreen({super.key, required this.user});
-  final UserModel user;
+  const IndividualChatScreen({super.key, required this.userId});
+  final String userId;
 
   @override
   State<IndividualChatScreen> createState() => _IndividualChatScreenState();
@@ -18,10 +16,17 @@ class IndividualChatScreen extends StatefulWidget {
 class _IndividualChatScreenState extends State<IndividualChatScreen> {
   @override
   void initState() {
-    messageController.addListener(() {
-      setState(() {
-        // Update the state based on whether the messageController is empty or not
-        isMessageEmpty = messageController.text.isEmpty;
+    Future.delayed(Duration.zero, () {
+      Provider.of<AuthController>(context, listen: false)
+          .getUserById(uid: widget.userId);
+      Provider.of<AuthController>(context, listen: false)
+          .getAllMessages(recieverId: widget.userId);
+
+      messageController.addListener(() {
+        setState(() {
+          // Update the state based on whether the messageController is empty or not
+          isMessageEmpty = messageController.text.isEmpty;
+        });
       });
     });
     super.initState();
@@ -31,96 +36,59 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
   final messageController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    final messges = [
-      Message(
-          messge: 'Hi How are You',
-          recieveId: widget.user.uid,
-          sendId: context.read<AuthController>().appUser!.uid,
-          sentTime: DateTime.now()),
-      Message(
-          messge: 'I Am Fine.. How are You ?',
-          recieveId: context.read<AuthController>().appUser!.uid,
-          sendId: widget.user.uid,
-          sentTime: DateTime.now()),
-      Message(
-          messge: 'Hi How are You',
-          recieveId: widget.user.uid,
-          sendId: context.read<AuthController>().appUser!.uid,
-          sentTime: DateTime.now()),
-      Message(
-          messge: 'Hi How are You',
-          recieveId: context.read<AuthController>().appUser!.uid,
-          sendId: widget.user.uid,
-          sentTime: DateTime.now()),
-    ];
+    // final messges = [
+    //   Message(
+    //       messge: 'Hi How are You',
+    //       recieveId: widget.userId,
+    //       sendId: context.read<AuthController>().appUser!.uid,
+    //       sentTime: DateTime.now()),
+    //   Message(
+    //       messge: 'I Am Fine.. How are You ?',
+    //       recieveId: context.read<AuthController>().appUser!.uid,
+    //       sendId: widget.userId,
+    //       sentTime: DateTime.now()),
+    //   Message(
+    //       messge: 'Hi How are You',
+    //       recieveId: widget.userId,
+    //       sendId: context.read<AuthController>().appUser!.uid,
+    //       sentTime: DateTime.now()),
+    //   Message(
+    //       messge: 'Hi How are You',
+    //       recieveId: context.read<AuthController>().appUser!.uid,
+    //       sendId: widget.userId,
+    //       sentTime: DateTime.now()),
+    // ];
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange.shade300,
         foregroundColor: Colors.white,
-        title: Row(
-          children: [
-            widget.user.image != null
-                ? CircleAvatar(
-                    radius: 25,
-                    backgroundColor: Colors.orange.shade100,
-                    child: Container(
-                      height: screenHeight(context),
-                      width: screenWidth(context),
-                      // margin: EdgeInsets.all(5),
-                      // padding: EdgeInsets.all(5),
-                      clipBehavior: Clip.antiAlias,
-                      decoration: const BoxDecoration(shape: BoxShape.circle),
-                      child: CachedNetworkImage(
-                        fit: BoxFit.fill,
-                        imageUrl: widget.user.image!,
-                        placeholder: (context, url) =>
-                            const CircularProgressIndicator(
-                          strokeWidth: 3,
-                          color: Colors.deepOrange,
-                        ),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                      ),
-                    ),
-                  )
-                : const CircleAvatar(
-                    radius: 25,
-                  ),
-            const SizedBox(
-              width: 10,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.user.name,
-                  style: const TextStyle(fontSize: 20),
-                ),
-                Text(
-                  widget.user.isOnline ? 'Online' : 'Ofline',
-                  style: TextStyle(
-                      fontSize: 14,
-                      color: widget.user.isOnline ? Colors.green : Colors.grey),
-                ),
-              ],
-            )
-          ],
-        ),
+        title: CustomAppBar(widget: widget),
       ),
       body: Column(
         children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: messges.length,
-              itemBuilder: (context, index) {
-                final isMe = messges[index].sendId ==
-                    context.read<AuthController>().appUser!.uid;
-                return MessgeBubble(
-                  isMe: isMe,
-                  message: messges[index],
-                );
-              },
-            ),
+          Consumer<AuthController>(
+            builder: (context, value, child) {
+              print(value.messages.length);
+              return value.messages.isNotEmpty
+                  ? Expanded(
+                      child: ListView.builder(
+                        itemCount: value.messages.length,
+                        itemBuilder: (context, index) {
+                          final isMe = value.messages[index].sendId ==
+                              context.read<AuthController>().appUser!.uid;
+                          return MessgeBubble(
+                            isMe: isMe,
+                            message: value.messages[index],
+                          );
+                        },
+                      ),
+                    )
+                  : const Expanded(
+                      child: Center(
+                        child: Text('NO '),
+                      ),
+                    );
+            },
           ),
           Padding(
             padding:
@@ -158,7 +126,10 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
                   child: IconButton(
                       onPressed: isMessageEmpty
                           ? null
-                          : () {
+                          : () async {
+                              await context.read<AuthController>().sendMessge(
+                                  recieveId: widget.userId,
+                                  text: messageController.text);
                               print('object');
                             },
                       icon: Icon(
@@ -171,6 +142,69 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class CustomAppBar extends StatelessWidget {
+  const CustomAppBar({
+    super.key,
+    required this.widget,
+  });
+
+  final IndividualChatScreen widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthController>(
+      builder: (context, value, child) {
+        final user = value.user;
+        return user != null
+            ? Row(
+                children: [
+                  CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.orange.shade100,
+                    child: Container(
+                      height: screenHeight(context),
+                      width: screenWidth(context),
+                      clipBehavior: Clip.antiAlias,
+                      decoration: const BoxDecoration(shape: BoxShape.circle),
+                      child: CachedNetworkImage(
+                        fit: BoxFit.fill,
+                        imageUrl: user.image ?? '',
+                        placeholder: (context, url) =>
+                            const CircularProgressIndicator(
+                          strokeWidth: 3,
+                          color: Colors.deepOrange,
+                        ),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user.name,
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      Text(
+                        user.isOnline ? 'Online' : 'Offline',
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: user.isOnline ? Colors.green : Colors.grey),
+                      ),
+                    ],
+                  )
+                ],
+              )
+            : const SizedBox(); // Return an empty SizedBox if user is null
+      },
     );
   }
 }

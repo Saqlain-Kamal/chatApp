@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:chatapp/db/auth_db.dart';
+import 'package:chatapp/model/message_model.dart';
 import 'package:chatapp/model/usermodel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,7 +12,10 @@ import 'package:image_picker/image_picker.dart';
 
 class AuthController extends ChangeNotifier {
   List<UserModel> users = [];
+  List<Message> messages = [];
   UserModel? appUser;
+  UserModel? user;
+
   final db = AuthDB();
   XFile? pickedImage;
   bool isloading = false;
@@ -122,5 +126,77 @@ class AuthController extends ChangeNotifier {
       log(e.toString());
     }
     return null;
+  }
+
+  UserModel? getUserById({required String uid}) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .snapshots(includeMetadataChanges: true)
+        .listen((data) {
+      user = UserModel.fromJson(data.data()!);
+      notifyListeners();
+    });
+
+    return user;
+  }
+
+  Future<void> sendMessge({
+    required String text,
+    required String recieveId,
+  }) async {
+    final message = Message(
+        message: text,
+        recieveId: recieveId,
+        sendId: FirebaseAuth.instance.currentUser!.uid,
+        sentTime: DateTime.now());
+
+    await addMessageToDb(recieveId: recieveId, message: message);
+  }
+
+  Future<void> addMessageToDb({
+    required String recieveId,
+    required Message message,
+  }) async {
+    log(message.json().toString());
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('chats')
+        .doc(recieveId)
+        .collection('messages')
+        .add(message.json());
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(recieveId)
+        .collection('chats')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('messages')
+        .add(message.json());
+  }
+
+  Future<List<Message>> getAllMessages({required String recieverId}) async {
+    try {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection('chats')
+          .doc(recieverId)
+          .collection('messages')
+          .orderBy('sentTime', descending: false)
+          .snapshots(includeMetadataChanges: true)
+          .listen((event) {
+        messages = event.docs.map((e) => Message.fromJson(e.data())).toList();
+        notifyListeners();
+      });
+
+      log('khaaaa${messages.toString()}');
+
+      return messages;
+    } catch (e) {
+      print('Error fetching messages: $e');
+      rethrow; // You can handle the error as needed in the calling code
+    }
   }
 }
