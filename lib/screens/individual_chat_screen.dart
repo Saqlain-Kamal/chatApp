@@ -1,7 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chatapp/auth/widgets/messge_bubble.dart';
 import 'package:chatapp/common/media_query.dart';
+import 'package:chatapp/controller/auth_controller.dart';
+import 'package:chatapp/model/message_model.dart';
 import 'package:chatapp/model/usermodel.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class IndividualChatScreen extends StatefulWidget {
   const IndividualChatScreen({super.key, required this.user});
@@ -13,7 +17,42 @@ class IndividualChatScreen extends StatefulWidget {
 
 class _IndividualChatScreenState extends State<IndividualChatScreen> {
   @override
+  void initState() {
+    messageController.addListener(() {
+      setState(() {
+        // Update the state based on whether the messageController is empty or not
+        isMessageEmpty = messageController.text.isEmpty;
+      });
+    });
+    super.initState();
+  }
+
+  bool isMessageEmpty = true;
+  final messageController = TextEditingController();
+  @override
   Widget build(BuildContext context) {
+    final messges = [
+      Message(
+          messge: 'Hi How are You',
+          recieveId: widget.user.uid,
+          sendId: context.read<AuthController>().appUser!.uid,
+          sentTime: DateTime.now()),
+      Message(
+          messge: 'I Am Fine.. How are You ?',
+          recieveId: context.read<AuthController>().appUser!.uid,
+          sendId: widget.user.uid,
+          sentTime: DateTime.now()),
+      Message(
+          messge: 'Hi How are You',
+          recieveId: widget.user.uid,
+          sendId: context.read<AuthController>().appUser!.uid,
+          sentTime: DateTime.now()),
+      Message(
+          messge: 'Hi How are You',
+          recieveId: context.read<AuthController>().appUser!.uid,
+          sendId: widget.user.uid,
+          sentTime: DateTime.now()),
+    ];
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange.shade300,
@@ -72,19 +111,26 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: 50,
+              itemCount: messges.length,
               itemBuilder: (context, index) {
-                return const Text('data');
+                final isMe = messges[index].sendId ==
+                    context.read<AuthController>().appUser!.uid;
+                return MessgeBubble(
+                  isMe: isMe,
+                  message: messges[index],
+                );
               },
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
+            padding:
+                const EdgeInsets.only(left: 15, bottom: 25, right: 15, top: 5),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: TextField(
+                    controller: messageController,
                     decoration: InputDecoration(
                       focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
@@ -105,14 +151,19 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
                 ),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.orange,
+                    color:
+                        isMessageEmpty ? Colors.grey.shade300 : Colors.orange,
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
+                      onPressed: isMessageEmpty
+                          ? null
+                          : () {
+                              print('object');
+                            },
+                      icon: Icon(
                         Icons.send,
-                        color: Colors.white,
+                        color: isMessageEmpty ? Colors.black : Colors.white,
                       )),
                 )
               ],

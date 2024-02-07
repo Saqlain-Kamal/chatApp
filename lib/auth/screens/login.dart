@@ -29,9 +29,17 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              const Icon(
-                Icons.lock,
-                size: 150,
+              Container(
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(70)),
+                child: const Icon(
+                  Icons.lock,
+                  size: 120,
+                  color: Colors.white,
+                ),
               ),
               Column(
                 children: [

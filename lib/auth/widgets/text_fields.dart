@@ -14,11 +14,11 @@ class TextFieldWidget extends StatelessWidget {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
-        focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(width: 2, color: Colors.orange)),
+        focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(width: 2, color: Colors.orange.shade300)),
         enabled: true,
-        enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(width: 0.4, color: Colors.orange)),
+        enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(width: 0.4, color: Colors.orange.shade300)),
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.grey),
       ),

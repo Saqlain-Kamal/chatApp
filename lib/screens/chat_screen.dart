@@ -70,21 +70,33 @@ class _ChatScreenState extends State<ChatScreen> {
                                   radius: 40,
                                 ),
                           Positioned(
-                              bottom: 0,
-                              right: 10,
-                              child: GestureDetector(
-                                  onTap: () async {
-                                    final img = await ImagePicker()
-                                        .pickImage(source: ImageSource.gallery);
+                            bottom: 0,
+                            right: 10,
+                            child: GestureDetector(
+                              onTap: () async {
+                                try {
+                                  final img = await ImagePicker()
+                                      .pickImage(source: ImageSource.gallery);
 
-                                    if (img != null) {
-                                      await value.uploadProfileImage(img);
-                                    }
-                                  },
-                                  child: const Icon(
-                                    Icons.camera,
-                                    color: Colors.deepOrange,
-                                  )))
+                                  if (img != null) {
+                                    await value.uploadProfileImage(img);
+                                  }
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                    backgroundColor: Colors.deepOrange,
+                                    content: Text(
+                                      e.toString(),
+                                    ),
+                                  ));
+                                }
+                              },
+                              child: const Icon(
+                                Icons.camera,
+                                color: Colors.deepOrange,
+                              ),
+                            ),
+                          )
                         ],
                       );
               },
@@ -95,9 +107,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: ListView.builder(
                     itemCount: value.users.length,
                     itemBuilder: (context, index) {
-                      return SingleUser(
-                        user: value.users[index],
-                      );
+                      return value.users[index].uid !=
+                              FirebaseAuth.instance.currentUser!.uid
+                          ? SingleUser(
+                              user: value.users[index],
+                            )
+                          : const SizedBox();
                     },
                   ),
                 );

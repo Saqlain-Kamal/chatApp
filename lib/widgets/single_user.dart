@@ -34,7 +34,7 @@ class _SingleUserState extends State<SingleUser> {
           children: [
             widget.user.image != null
                 ? CircleAvatar(
-                    radius: 25,
+                    radius: 30,
                     backgroundColor: Colors.orange.shade100,
                     child:
                         // CachedNetworkImage(
@@ -66,7 +66,7 @@ class _SingleUserState extends State<SingleUser> {
                             )),
                   )
                 : CircleAvatar(
-                    radius: 25,
+                    radius: 30,
                     backgroundColor: Colors.orange.shade100,
                   ),
             Positioned(
