@@ -3,6 +3,7 @@ import 'package:chatapp/auth/widgets/messge_bubble.dart';
 import 'package:chatapp/common/media_query.dart';
 import 'package:chatapp/controller/auth_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class IndividualChatScreen extends StatefulWidget {
@@ -60,7 +61,7 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
     // ];
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange.shade300,
+        backgroundColor: Colors.orangeAccent.shade100,
         foregroundColor: Colors.white,
         title: CustomAppBar(widget: widget),
       ),
@@ -71,21 +72,26 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
               print(value.messages.length);
               return value.messages.isNotEmpty
                   ? Expanded(
-                      child: ListView.builder(
-                        itemCount: value.messages.length,
-                        itemBuilder: (context, index) {
-                          final isMe = value.messages[index].sendId ==
-                              context.read<AuthController>().appUser!.uid;
-                          return MessgeBubble(
-                            isMe: isMe,
-                            message: value.messages[index],
-                          );
-                        },
+                      child: PageStorage(
+                        bucket: PageStorageBucket(),
+                        child: ListView.builder(
+                          key: const PageStorageKey<String>('uniqueKey'),
+                          controller: value.scrollController,
+                          itemCount: value.messages.length,
+                          itemBuilder: (context, index) {
+                            final isMe = value.messages[index].sendId ==
+                                context.read<AuthController>().appUser!.uid;
+                            return MessgeBubble(
+                              isMe: isMe,
+                              message: value.messages[index],
+                            );
+                          },
+                        ),
                       ),
                     )
                   : const Expanded(
                       child: Center(
-                        child: Text('NO '),
+                        child: Text('No Chat Yet !'),
                       ),
                     );
             },
@@ -109,7 +115,7 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
                           borderRadius: BorderRadius.circular(20),
                           borderSide:
                               const BorderSide(width: 1, color: Colors.orange)),
-                      hintText: 'Enter Message',
+                      hintText: 'Enter message...',
                       hintStyle: const TextStyle(color: Colors.grey),
                     ),
                   ),
@@ -129,7 +135,8 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
                           : () async {
                               await context.read<AuthController>().sendMessge(
                                   recieveId: widget.userId,
-                                  text: messageController.text);
+                                  text: messageController);
+
                               print('object');
                             },
                       icon: Icon(
@@ -159,6 +166,9 @@ class CustomAppBar extends StatelessWidget {
     return Consumer<AuthController>(
       builder: (context, value, child) {
         final user = value.user;
+        final time = value.user != null
+            ? DateFormat('h:mm a').format(user!.lastSeen)
+            : '';
         return user != null
             ? Row(
                 children: [
@@ -194,7 +204,7 @@ class CustomAppBar extends StatelessWidget {
                         style: const TextStyle(fontSize: 20),
                       ),
                       Text(
-                        user.isOnline ? 'Online' : 'Offline',
+                        user.isOnline ? 'Online' : 'Last Seen $time',
                         style: TextStyle(
                             fontSize: 14,
                             color: user.isOnline ? Colors.green : Colors.grey),

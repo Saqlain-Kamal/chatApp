@@ -15,22 +15,30 @@ class AuthController extends ChangeNotifier {
   List<Message> messages = [];
   UserModel? appUser;
   UserModel? user;
+  Map<String, String> lastMessages =
+      {}; // Map to store last message for each user
 
+  ScrollController scrollController = ScrollController();
   final db = AuthDB();
   XFile? pickedImage;
   bool isloading = false;
 
   final FirebaseAuth auth = FirebaseAuth.instance;
-  List<UserModel> getUsers() {
-    FirebaseFirestore.instance
-        .collection('users')
-        .snapshots(includeMetadataChanges: true)
-        .listen((user) {
-      users = user.docs.map((e) => UserModel.fromJson(e.data())).toList();
-      notifyListeners();
-    });
+  Future<List<UserModel>> getUsers() async {
+    try {
+      FirebaseFirestore.instance
+          .collection('users')
+          .snapshots(includeMetadataChanges: true)
+          .listen((event) {
+        users = event.docs.map((e) => UserModel.fromJson(e.data())).toList();
+        notifyListeners();
+      });
 
-    return users;
+      return users;
+    } catch (e) {
+      print('Error fetching users: $e');
+      return [];
+    }
   }
 
   Future<UserCredential> sighInWithEmailAndPassword(
@@ -142,15 +150,15 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<void> sendMessge({
-    required String text,
+    required TextEditingController text,
     required String recieveId,
   }) async {
     final message = Message(
-        message: text,
+        message: text.text,
         recieveId: recieveId,
         sendId: FirebaseAuth.instance.currentUser!.uid,
         sentTime: DateTime.now());
-
+    text.clear();
     await addMessageToDb(recieveId: recieveId, message: message);
   }
 
@@ -188,6 +196,23 @@ class AuthController extends ChangeNotifier {
           .snapshots(includeMetadataChanges: true)
           .listen((event) {
         messages = event.docs.map((e) => Message.fromJson(e.data())).toList();
+
+        if (messages.isNotEmpty) {
+          // Determine the last message for this receiver
+          String lastMessage = messages.last.message;
+          String recievedId = recieverId; // Store receiverId
+
+          // Update last message for this receiver
+
+          lastMessages[recievedId] = lastMessage;
+        } else {
+          // No messages
+          String recievedId = recieverId; // Store receiverId
+
+          lastMessages[recievedId] = ''; // Empty string if no messages
+        }
+
+        scrollToEnd();
         notifyListeners();
       });
 
@@ -198,5 +223,22 @@ class AuthController extends ChangeNotifier {
       print('Error fetching messages: $e');
       rethrow; // You can handle the error as needed in the calling code
     }
+  }
+
+  void scrollToEnd() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
+  Future<void> updateUserStatus(Map<String, dynamic> data) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update(data);
   }
 }

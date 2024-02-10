@@ -13,11 +13,33 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     getAllUsers();
     super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print('my state is${state.name}');
+    switch (state) {
+      case AppLifecycleState.resumed:
+        context.read<AuthController>().updateUserStatus({'isOnline': true});
+
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        context.read<AuthController>().updateUserStatus({
+          'isOnline': false,
+          'lastSeen': DateTime.now(),
+        });
+
+      default:
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   void getAllUsers() {
@@ -101,6 +123,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       );
               },
             ),
+            const SizedBox(
+              height: 10,
+            ),
             Consumer<AuthController>(
               builder: (context, value, child) {
                 return Expanded(
@@ -111,6 +136,9 @@ class _ChatScreenState extends State<ChatScreen> {
                               FirebaseAuth.instance.currentUser!.uid
                           ? SingleUser(
                               user: value.users[index],
+                              lastMessage: value
+                                  .lastMessages[value.users[index].uid]
+                                  .toString(),
                             )
                           : const SizedBox();
                     },

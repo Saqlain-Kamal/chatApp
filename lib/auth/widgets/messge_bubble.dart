@@ -22,7 +22,7 @@ class MessgeBubble extends StatelessWidget {
             color: isMe ? Colors.orange.shade400 : Colors.blue.shade400),
         child: Column(
           crossAxisAlignment:
-              isMe ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             SizedBox(
               child: Text(
@@ -30,7 +30,7 @@ class MessgeBubble extends StatelessWidget {
                 style: const TextStyle(fontSize: 15, color: Colors.white),
               ),
             ),
-            Text(DateFormat.Hms().format(message.sentTime))
+            Text(DateFormat('h:mm').format(message.sentTime))
           ],
         ),
       ),
