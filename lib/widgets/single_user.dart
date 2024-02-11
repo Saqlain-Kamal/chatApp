@@ -96,7 +96,7 @@ class _SingleUserState extends State<SingleUser> {
                           imageUrl: widget.user.image!,
                           placeholder: (context, url) =>
                               const CircularProgressIndicator(
-                            strokeWidth: 3,
+                            strokeWidth: 5,
                             color: Colors.deepOrange,
                           ),
                           errorWidget: (context, url, error) =>

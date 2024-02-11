@@ -1,6 +1,7 @@
 import 'package:chatapp/auth/screens/sign_up.dart';
 import 'package:chatapp/auth/widgets/text_fields.dart';
 import 'package:chatapp/common/custom_button.dart';
+import 'package:chatapp/common/media_query.dart';
 import 'package:chatapp/controller/auth_controller.dart';
 import 'package:chatapp/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
@@ -26,87 +27,93 @@ class _LoginScreenState extends State<LoginScreen> {
         key: formKey,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                    color: Colors.orange,
-                    borderRadius: BorderRadius.circular(70)),
-                child: const Icon(
-                  Icons.lock,
-                  size: 120,
-                  color: Colors.white,
-                ),
-              ),
-              Column(
+          child: SingleChildScrollView(
+            child: SizedBox(
+              height: screenHeight(context) * 0.7,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  TextFieldWidget(
-                      controller: emailController, hint: 'Enter Name'),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  TextFieldWidget(
-                    controller: passwordController,
-                    hint: 'Enter password',
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  CustomButton(
-                    text: 'Log In',
-                    isloading: isloading,
-                    onTap: () async {
-                      setState(() {
-                        isloading = true;
-                      });
-                      try {
-                        await context
-                            .read<AuthController>()
-                            .sighInWithEmailAndPassword(
-                                emailController.text.trim(),
-                                passwordController.text.trim());
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const ChatScreen()));
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          backgroundColor: Colors.deepOrange,
-                          content: Text(
-                            e.toString(),
-                          ),
-                        ));
-                      }
-                      setState(() {
-                        isloading = false;
-                      });
-                    },
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignUpScreen()));
-                      },
-                      child: const Text(
-                        'SignUp',
-                        textAlign: TextAlign.end,
-                      ),
+                  Container(
+                    width: 150,
+                    height: 150,
+                    decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(70)),
+                    child: const Icon(
+                      Icons.lock,
+                      size: 120,
+                      color: Colors.white,
                     ),
                   ),
+                  Column(
+                    children: [
+                      TextFieldWidget(
+                          controller: emailController, hint: 'Enter Name'),
+                      const SizedBox(
+                        height: 40,
+                      ),
+                      TextFieldWidget(
+                        controller: passwordController,
+                        hint: 'Enter password',
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      CustomButton(
+                        text: 'Log In',
+                        isloading: isloading,
+                        onTap: () async {
+                          setState(() {
+                            isloading = true;
+                          });
+                          try {
+                            await context
+                                .read<AuthController>()
+                                .sighInWithEmailAndPassword(
+                                    emailController.text.trim(),
+                                    passwordController.text.trim());
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const ChatScreen()));
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              backgroundColor: Colors.deepOrange,
+                              content: Text(
+                                e.toString(),
+                              ),
+                            ));
+                          }
+                          setState(() {
+                            isloading = false;
+                          });
+                        },
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const SignUpScreen()));
+                          },
+                          child: const Text(
+                            'SignUp',
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),

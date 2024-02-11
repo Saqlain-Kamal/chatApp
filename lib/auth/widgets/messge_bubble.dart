@@ -18,16 +18,25 @@ class MessgeBubble extends StatelessWidget {
         margin: const EdgeInsets.all(10),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            color: isMe ? Colors.orange.shade400 : Colors.blue.shade400),
+          borderRadius: BorderRadius.circular(15),
+          gradient: isMe
+              ? LinearGradient(
+                  colors: [Colors.orange.shade500, Colors.orange.shade400],
+                )
+              : LinearGradient(
+                  colors: [Colors.orange.shade100, Colors.orange.shade100],
+                ),
+        ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment:
               isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             SizedBox(
               child: Text(
                 message.message,
-                style: const TextStyle(fontSize: 15, color: Colors.white),
+                style: TextStyle(
+                    fontSize: 15, color: isMe ? Colors.white : Colors.black),
               ),
             ),
             Text(DateFormat('h:mm').format(message.sentTime))

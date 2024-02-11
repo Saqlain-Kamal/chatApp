@@ -82,6 +82,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 DateFormat.yMMMEd().format(now);
                             print(formattedDate);
                             final user = UserModel(
+                                isTyping: false,
                                 email: emailController.text.trim(),
                                 isOnline: true,
                                 lastSeen: now,

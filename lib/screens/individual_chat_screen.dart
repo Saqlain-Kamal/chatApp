@@ -27,6 +27,9 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
         setState(() {
           // Update the state based on whether the messageController is empty or not
           isMessageEmpty = messageController.text.isEmpty;
+          if (!isMessageEmpty) {
+            context.read<AuthController>().updateUserStatus({'isTyping': true});
+          }
         });
       });
     });
@@ -57,11 +60,21 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
     //       messge: 'Hi How are You',
     //       recieveId: context.read<AuthController>().appUser!.uid,
     //       sendId: widget.userId,
-    //       sentTime: DateTime.now()),
+    //       sentTime: DateTime.nosw()),
     // ];
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orangeAccent.shade100,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: <Color>[
+                  Colors.orange.shade600,
+                  Colors.orange.shade400
+                ]),
+          ),
+        ),
         foregroundColor: Colors.white,
         title: CustomAppBar(widget: widget),
       ),
@@ -204,10 +217,10 @@ class CustomAppBar extends StatelessWidget {
                         style: const TextStyle(fontSize: 20),
                       ),
                       Text(
-                        user.isOnline ? 'Online' : 'Last Seen $time',
+                        user.isOnline ? user.isTyping ? 'Online' : 'Last seen $time',
                         style: TextStyle(
                             fontSize: 14,
-                            color: user.isOnline ? Colors.green : Colors.grey),
+                            color: user.isOnline ? Colors.green : Colors.white),
                       ),
                     ],
                   )
