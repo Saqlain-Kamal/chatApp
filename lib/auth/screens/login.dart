@@ -3,6 +3,7 @@ import 'package:chatapp/auth/widgets/text_fields.dart';
 import 'package:chatapp/common/custom_button.dart';
 import 'package:chatapp/common/media_query.dart';
 import 'package:chatapp/controller/auth_controller.dart';
+import 'package:chatapp/notifications/notifications.dart';
 import 'package:chatapp/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final notification = NotificationServices();
   bool isloading = false;
   @override
   Widget build(BuildContext context) {
@@ -73,6 +75,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 .sighInWithEmailAndPassword(
                                     emailController.text.trim(),
                                     passwordController.text.trim());
+                            // ignore: use_build_context_synchronously
+
+                            await notification.requestPermission();
+                            // ignore: use_build_context_synchronously
+                            await notification.getToken(context);
+
                             Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(

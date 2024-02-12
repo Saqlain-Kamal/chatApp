@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chatapp/auth/widgets/messge_bubble.dart';
 import 'package:chatapp/common/media_query.dart';
 import 'package:chatapp/controller/auth_controller.dart';
+import 'package:chatapp/notifications/notifications.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +17,7 @@ class IndividualChatScreen extends StatefulWidget {
 }
 
 class _IndividualChatScreenState extends State<IndividualChatScreen> {
+  final notification = NotificationServices();
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
@@ -28,11 +31,17 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
           // Update the state based on whether the messageController is empty or not
           isMessageEmpty = messageController.text.isEmpty;
           if (!isMessageEmpty) {
+            print('hihihihihiih');
             context.read<AuthController>().updateUserStatus({'isTyping': true});
+          } else {
+            context
+                .read<AuthController>()
+                .updateUserStatus({'isTyping': false});
           }
         });
       });
     });
+    notification.getRecieverToken(widget.userId);
     super.initState();
   }
 
@@ -149,6 +158,10 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
                               await context.read<AuthController>().sendMessge(
                                   recieveId: widget.userId,
                                   text: messageController);
+                              await notification.sendNotification(
+                                  body: messageController.text,
+                                  sendId:
+                                      FirebaseAuth.instance.currentUser!.uid);
 
                               print('object');
                             },
@@ -217,7 +230,11 @@ class CustomAppBar extends StatelessWidget {
                         style: const TextStyle(fontSize: 20),
                       ),
                       Text(
-                        user.isOnline ? user.isTyping ? 'Online' : 'Last seen $time',
+                        user.isOnline
+                            ? user.isTyping
+                                ? 'Typing...'
+                                : 'Online'
+                            : 'Last seen $time',
                         style: TextStyle(
                             fontSize: 14,
                             color: user.isOnline ? Colors.green : Colors.white),

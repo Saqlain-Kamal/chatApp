@@ -241,4 +241,11 @@ class AuthController extends ChangeNotifier {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .update(data);
   }
+
+  Future<void> saveToken({required String token}) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .set({'token': token}, SetOptions(merge: true));
+  }
 }

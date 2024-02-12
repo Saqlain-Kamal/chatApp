@@ -6,6 +6,7 @@ import 'package:chatapp/common/custom_button.dart';
 import 'package:chatapp/common/media_query.dart';
 import 'package:chatapp/controller/auth_controller.dart';
 import 'package:chatapp/model/usermodel.dart';
+import 'package:chatapp/notifications/notifications.dart';
 import 'package:chatapp/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -24,6 +25,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final nameController = TextEditingController();
+  final notification = NotificationServices();
   bool isloading = false;
   File? selected;
   @override
@@ -88,6 +90,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 lastSeen: now,
                                 name: nameController.text.trim(),
                                 uid: '');
+                            await notification.requestPermission();
+                            // ignore: use_build_context_synchronously
+                            await notification.getToken(context);
+
                             print('1');
                             await context
                                 .read<AuthController>()

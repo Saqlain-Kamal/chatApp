@@ -109,27 +109,29 @@ class _SingleUserState extends State<SingleUser> {
                       backgroundColor: Colors.orange.shade300,
                     ),
               Positioned(
-                bottom: 0,
-                right: 0,
+                bottom: 2,
+                right: 2,
                 child: Consumer<AuthController>(
                   builder: (context, value, child) {
                     final user = value.user;
                     return user != null && widget.user.isOnline
                         ? Container(
                             decoration: BoxDecoration(
+                              border: Border.all(width: 1, color: Colors.white),
                               color: Colors.green,
                               borderRadius: BorderRadius.circular(50),
                             ),
-                            width: 12,
-                            height: 12,
+                            width: 15,
+                            height: 15,
                           )
                         : Container(
                             decoration: BoxDecoration(
+                              border: Border.all(width: 1, color: Colors.white),
                               color: Colors.grey,
                               borderRadius: BorderRadius.circular(50),
                             ),
-                            width: 12,
-                            height: 12,
+                            width: 15,
+                            height: 15,
                           );
                   },
                 ),

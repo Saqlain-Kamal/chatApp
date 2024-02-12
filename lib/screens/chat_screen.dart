@@ -1,5 +1,6 @@
 import 'package:chatapp/auth/screens/login.dart';
 import 'package:chatapp/controller/auth_controller.dart';
+import 'package:chatapp/notifications/notifications.dart';
 import 'package:chatapp/widgets/single_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,10 +15,13 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
+  final notification = NotificationServices();
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     getAllUsers();
+
+    notification.firebaseNotification(context);
     super.initState();
   }
 
