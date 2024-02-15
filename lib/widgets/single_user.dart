@@ -74,8 +74,10 @@ class _SingleUserState extends State<SingleUser> {
         );
       },
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
         child: ListTile(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           tileColor: Colors.orange.shade100,
           leading: Stack(
             clipBehavior: Clip.none,
@@ -117,7 +119,8 @@ class _SingleUserState extends State<SingleUser> {
                     return user != null && widget.user.isOnline
                         ? Container(
                             decoration: BoxDecoration(
-                              border: Border.all(width: 1, color: Colors.white),
+                              border:
+                                  Border.all(width: 1.5, color: Colors.white),
                               color: Colors.green,
                               borderRadius: BorderRadius.circular(50),
                             ),
@@ -126,7 +129,8 @@ class _SingleUserState extends State<SingleUser> {
                           )
                         : Container(
                             decoration: BoxDecoration(
-                              border: Border.all(width: 1, color: Colors.white),
+                              border:
+                                  Border.all(width: 1.5, color: Colors.white),
                               color: Colors.grey,
                               borderRadius: BorderRadius.circular(50),
                             ),

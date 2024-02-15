@@ -27,6 +27,11 @@ class _CheckState extends State<Check> {
           await context.read<AuthController>().checkCurrentUser(context);
       if (isCurrentUser != null) {
         // ignore: use_build_context_synchronously
+        await context
+            .read<AuthController>()
+            .updateUserStatus({'isOnline': true});
+
+        // ignore: use_build_context_synchronously
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const ChatScreen()));
       } else {

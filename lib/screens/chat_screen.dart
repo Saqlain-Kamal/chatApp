@@ -133,20 +133,27 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
             Consumer<AuthController>(
               builder: (context, value, child) {
                 return Expanded(
-                  child: ListView.builder(
-                    itemCount: value.users.length,
-                    itemBuilder: (context, index) {
-                      return value.users[index].uid !=
-                              FirebaseAuth.instance.currentUser!.uid
-                          ? SingleUser(
-                              user: value.users[index],
-                              lastMessage: value
-                                  .lastMessages[value.users[index].uid]
-                                  .toString(),
-                            )
-                          : const SizedBox();
-                    },
-                  ),
+                  child: value.users.isEmpty ||
+                          (value.users.length == 1 &&
+                              value.users.first.uid ==
+                                  FirebaseAuth.instance.currentUser!.uid)
+                      ? const Center(
+                          child: Text('No Users'),
+                        )
+                      : ListView.builder(
+                          itemCount: value.users.length,
+                          itemBuilder: (context, index) {
+                            return value.users[index].uid !=
+                                    FirebaseAuth.instance.currentUser!.uid
+                                ? SingleUser(
+                                    user: value.users[index],
+                                    lastMessage: value
+                                        .lastMessages[value.users[index].uid]
+                                        .toString(),
+                                  )
+                                : const SizedBox();
+                          },
+                        ),
                 );
               },
             ),

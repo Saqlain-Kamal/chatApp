@@ -86,6 +86,18 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
         ),
         foregroundColor: Colors.white,
         title: CustomAppBar(widget: widget),
+        actions: [
+          ElevatedButton(
+            onPressed: () async {
+              print('1');
+              await context
+                  .read<AuthController>()
+                  .deleteMessages(receiverId: widget.userId);
+              print('2');
+            },
+            child: const Text('Delete chat'),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -137,7 +149,7 @@ class _IndividualChatScreenState extends State<IndividualChatScreen> {
                           borderRadius: BorderRadius.circular(20),
                           borderSide:
                               const BorderSide(width: 1, color: Colors.orange)),
-                      hintText: 'Enter message...',
+                      hintText: 'Send message...',
                       hintStyle: const TextStyle(color: Colors.grey),
                     ),
                   ),

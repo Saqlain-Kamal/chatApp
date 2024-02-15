@@ -90,17 +90,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 lastSeen: now,
                                 name: nameController.text.trim(),
                                 uid: '');
-                            await notification.requestPermission();
-                            // ignore: use_build_context_synchronously
-                            await notification.getToken(context);
-
-                            print('1');
                             await context
                                 .read<AuthController>()
                                 .sighUpWithEmailAndPassword(
                                   user,
                                   passwordController.text.trim(),
                                 );
+                            await notification.requestPermission();
+                            // ignore: use_build_context_synchronously
+                            await notification.getToken(context);
+
+                            print('1');
 
                             print('2'); // ignore:
                             // use_build_context_synchronously

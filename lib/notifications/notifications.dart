@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class NotificationServices {
+  String? value;
   static const String key =
       'AAAA42QXzLk:APA91bEPL6Sw0QdZiyW0cd2aw4BK36BRxkSx6ZlHB7FW0xH7quociA0oOKMKDqx9BTwXuTr8KcbMB1X5g-9bbdKiDpUEDpOtN8mnMCk8Hh80MvpWMlxvIAHurknpySEY0efJroatvodb';
 
@@ -80,10 +81,13 @@ class NotificationServices {
   }
 
   Future<void> getToken(BuildContext context) async {
-    final token = FirebaseMessaging.instance.getToken().toString();
-    log('device Token is$token');
+    final token = await FirebaseMessaging.instance.getToken().then((data) {
+      value = data;
+      return value;
+    });
+    log('device Token is${value.toString()}');
 
-    await context.read<AuthController>().saveToken(token: token);
+    await context.read<AuthController>().saveToken(token: value.toString());
   }
 
   String recieverToken = '';
@@ -108,7 +112,7 @@ class NotificationServices {
             'priority': 'high',
             'notification': {
               'body': body,
-              'title': 'new Message !',
+              'title': 'ChatApp Message !',
             },
             'data': {
               'click_action': 'FLUTTER_NOTIFICATION_CLICK',

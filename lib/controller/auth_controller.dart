@@ -184,6 +184,27 @@ class AuthController extends ChangeNotifier {
         .add(message.json());
   }
 
+  Future<void> deleteMessages({required String receiverId}) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection('chats')
+          .doc(receiverId)
+          .collection('messages')
+          .get()
+          .then((querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          doc.reference.delete();
+        }
+      });
+
+      notifyListeners();
+    } catch (e) {
+      print('Error deleting messages: $e');
+    }
+  }
+
   Future<List<Message>> getAllMessages({required String recieverId}) async {
     try {
       FirebaseFirestore.instance
