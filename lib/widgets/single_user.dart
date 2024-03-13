@@ -13,10 +13,12 @@ class SingleUser extends StatefulWidget {
     Key? key,
     required this.user,
     required this.lastMessage,
+    required this.readOrUnread,
   }) : super(key: key);
 
   final UserModel user;
-  final String lastMessage; // Non-nullable
+  final String lastMessage;
+  final bool readOrUnread; // Non-nullable
 
   @override
   State<SingleUser> createState() => _SingleUserState();
@@ -145,7 +147,14 @@ class _SingleUserState extends State<SingleUser> {
           title: Text(widget.user.name),
           subtitle: isLoading
               ? const Text('Loading...') // Show loading indicator
-              : Text(widget.lastMessage), // Display last message
+              : Text(widget.lastMessage),
+          trailing: widget.readOrUnread
+              ? Container(
+                  width: 20,
+                  height: 20,
+                  color: Colors.red,
+                )
+              : const SizedBox(), // Display last message
         ),
       ),
     );

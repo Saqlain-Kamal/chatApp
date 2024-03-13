@@ -56,7 +56,7 @@ class NotificationServices {
 
     await flutterLocalNotificationsPlugin.show(0, message.notification!.title,
         message.notification!.body, notificationDetails,
-        payload: message.data['body']);
+        payload: message.data['title']);
   }
 
   Future<void> requestPermission() async {
@@ -112,7 +112,7 @@ class NotificationServices {
             'priority': 'high',
             'notification': {
               'body': body,
-              'title': 'ChatApp Message !',
+              'title': body,
             },
             'data': {
               'click_action': 'FLUTTER_NOTIFICATION_CLICK',

@@ -5,18 +5,22 @@ import 'package:chatapp/db/auth_db.dart';
 import 'package:chatapp/model/message_model.dart';
 import 'package:chatapp/model/usermodel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AuthController extends ChangeNotifier {
+  ConnectivityResult connectionStatus = ConnectivityResult.none;
+  final Connectivity connectivity = Connectivity();
   List<UserModel> users = [];
   List<Message> messages = [];
   UserModel? appUser;
   UserModel? user;
-  Map<String, String> lastMessages =
+  Map<String, Message> lastMessages =
       {}; // Map to store last message for each user
+  Map<String, String> last = {}; // Map to store last message for each user
 
   ScrollController scrollController = ScrollController();
   final db = AuthDB();
@@ -153,12 +157,16 @@ class AuthController extends ChangeNotifier {
     required TextEditingController text,
     required String recieveId,
   }) async {
+    final result = await initConnectivity();
+
     final message = Message(
+        isSend: result ? true : false,
         message: text.text,
         recieveId: recieveId,
         sendId: FirebaseAuth.instance.currentUser!.uid,
         sentTime: DateTime.now());
     text.clear();
+    log('1');
     await addMessageToDb(recieveId: recieveId, message: message);
   }
 
@@ -174,7 +182,7 @@ class AuthController extends ChangeNotifier {
         .doc(recieveId)
         .collection('messages')
         .add(message.json());
-
+    log('2');
     await FirebaseFirestore.instance
         .collection('users')
         .doc(recieveId)
@@ -182,6 +190,7 @@ class AuthController extends ChangeNotifier {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('messages')
         .add(message.json());
+    log('3');
   }
 
   Future<void> deleteMessages({required String receiverId}) async {
@@ -216,21 +225,32 @@ class AuthController extends ChangeNotifier {
           .orderBy('sentTime', descending: false)
           .snapshots(includeMetadataChanges: true)
           .listen((event) {
-        messages = event.docs.map((e) => Message.fromJson(e.data())).toList();
-
+        // messages = event.docs.map((e) => Message.fromJson(e.data())).toList();
+        messages = event.docs.map((e) {
+          Message message = Message.fromJson(e.data());
+          // Mark the message as read when it's fetched
+          message.isRead = true;
+          return message;
+        }).toList();
         if (messages.isNotEmpty) {
           // Determine the last message for this receiver
-          String lastMessage = messages.last.message;
+          Message lastMessage = messages.last;
           String recievedId = recieverId; // Store receiverId
 
           // Update last message for this receiver
 
           lastMessages[recievedId] = lastMessage;
+          last[recievedId] = lastMessage.message;
         } else {
           // No messages
           String recievedId = recieverId; // Store receiverId
 
-          lastMessages[recievedId] = ''; // Empty string if no messages
+          lastMessages[recievedId] = Message(
+              message: '',
+              recieveId: '',
+              sendId: '',
+              sentTime: DateTime.now(),
+              isSend: true); // Empty string if no messages
         }
 
         scrollToEnd();
@@ -268,5 +288,22 @@ class AuthController extends ChangeNotifier {
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .set({'token': token}, SetOptions(merge: true));
+  }
+
+  Future<bool> initConnectivity() async {
+    bool isConnected = false;
+    ConnectivityResult connectivityResult = ConnectivityResult.none;
+    try {
+      connectivityResult = await connectivity.checkConnectivity();
+    } catch (e) {
+      print('Error: $e');
+    }
+    connectionStatus = connectivityResult;
+    if (connectionStatus == ConnectivityResult.mobile ||
+        connectionStatus == ConnectivityResult.wifi) {
+      isConnected = true;
+    }
+    notifyListeners();
+    return isConnected;
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chatapp/auth/screens/login.dart';
 import 'package:chatapp/controller/auth_controller.dart';
 import 'package:chatapp/notifications/notifications.dart';
@@ -85,6 +87,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                         child: CircularProgressIndicator(),
                       )
                     : Stack(
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
                         children: [
                           value.appUser?.image != null
                               ? CircleAvatar(
@@ -143,13 +146,22 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
                       : ListView.builder(
                           itemCount: value.users.length,
                           itemBuilder: (context, index) {
+                            bool hasUnreadMessage =
+                                value.lastMessages[value.users[index].uid] !=
+                                        null &&
+                                    !value.lastMessages[value.users[index].uid]!
+                                        .isRead;
+                            log('do i have ${hasUnreadMessage.toString()}');
                             return value.users[index].uid !=
                                     FirebaseAuth.instance.currentUser!.uid
-                                ? SingleUser(
-                                    user: value.users[index],
-                                    lastMessage: value
-                                        .lastMessages[value.users[index].uid]
-                                        .toString(),
+                                ? SizedBox(
+                                    child: SingleUser(
+                                      readOrUnread: hasUnreadMessage,
+                                      user: value.users[index],
+                                      lastMessage:
+                                          value.last[value.users[index].uid] ??
+                                              '',
+                                    ),
                                   )
                                 : const SizedBox();
                           },
